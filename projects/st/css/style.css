@@ -1,14 +1,28 @@
-@font-face 
-{
-  font-family: Benguiat;
-  src: url("../fonts/BenguiatStd-Book.otf") format("opentype");
+@font-face {
+  font-family: 'BenguiatStd-Bold';
+  src: url('BenguiatStd-Bold.woff2') format('woff2'),
+      url('BenguiatStd-Bold.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
 }
 
-@font-face 
-{
-  font-family: Benguiat;
-  font-weight: bold;
-  src: url("../fonts/BenguiatStd-Bold.otf") format("opentype");
+@font-face {
+  font-family: 'BenguiatStd-Book';
+  src: url('BenguiatStd-Book.woff2') format('woff2'),
+      url('BenguiatStd-Book.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'BenguiatStd-Medium';
+  src: url('BenguiatStd-Medium.woff2') format('woff2'),
+      url('BenguiatStd-Medium.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
 }
 
 .stranger-font
