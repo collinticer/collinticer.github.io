@@ -27,7 +27,8 @@ h1.stranger-font
   font-size: 8rem;
   -webkit-text-stroke: 1px #ed0207;
   text-transform: uppercase;
-  line-height: 0.9;
+  line-height: 0.8;
+  padding-top: 10px;
 }
 
 h1.stranger-font.subtext
