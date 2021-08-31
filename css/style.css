@@ -1,3 +1,21 @@
+@font-face 
+{
+  font-family: Benguiat;
+  src: url("../fonts/BenguiatStd-Medium.otf") format("opentype");
+}
+
+@font-face 
+{
+  font-family: Benguiat;
+  font-weight: bold;
+  src: url("../fonts/BenguiatStd-Bold.otf") format("opentype");
+}
+
+.stranger-font
+{
+  font-family: Benguiat;
+}
+
 body 
 {
   padding-top: 5rem;
@@ -8,3 +26,4 @@ body
   padding: 3rem 1.5rem;
   text-align: center;
 }
+

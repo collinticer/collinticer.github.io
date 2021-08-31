@@ -1,0 +1,69 @@
+@font-face 
+{
+  font-family: Benguiat;
+  src: url("../fonts/BenguiatStd-Book.otf") format("opentype");
+}
+
+@font-face 
+{
+  font-family: Benguiat;
+  font-weight: bold;
+  src: url("../fonts/BenguiatStd-Bold.otf") format("opentype");
+}
+
+.stranger-font
+{
+  font-family: Benguiat;
+  color: #000;
+}
+
+.bg-dark
+{
+  background-color: #000 !important;
+}
+
+h1.stranger-font
+{
+  font-size: 8rem;
+  -webkit-text-stroke: 1px #ed0207;
+  text-transform: uppercase;
+  line-height: 0.8;
+}
+
+h1.stranger-font.subtext
+{
+  top: -25px;
+  position: relative;
+  background-color: #000;
+}
+
+.red-border-box
+{
+  border: 1px solid #ed0207;
+  height: 5px;
+}
+
+.top-text
+{
+  vertical-align: top;
+  position: relative;
+  top: 10px;
+}
+
+h1.stranger-font .first-letter, 
+h1.stranger-font .last-letter
+{
+  font-size: 10rem;
+}
+
+body 
+{
+  padding-top: 5rem;
+}
+
+.starter-template 
+{
+  padding: 3rem 1.5rem;
+  text-align: center;
+}
+
