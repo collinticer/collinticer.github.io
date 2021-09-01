@@ -82,12 +82,3 @@ body
   /*padding: 3rem 1.5rem;*/
   text-align: center;
 }
-
-#myCanvas
-{
-  background-color: #000;
-  overflow: hidden;
-  position: absolute;
-  top: 0;
-  z-index: -1;
-}
