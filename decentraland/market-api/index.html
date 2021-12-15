@@ -19,6 +19,41 @@
             color: #FFF;
             background-color: rgb(121, 17, 153);
         }
+
+        .badge-common {
+            color: #000;
+            background-color: #abc1c1;
+        }
+
+        .badge-uncommon {
+            color: #fff;
+            background-color: #ed6d4f;
+        }
+
+        .badge-rare {
+            color: #fff;
+            background-color: #36cf75;
+        }
+
+        .badge-epic {
+            color: #fff;
+            background-color: #3d85e6;
+        }
+
+        .badge-legendary {
+            color: #fff;
+            background-color: #842dda;
+        }
+
+        .badge-mythic {
+            color: #fff;
+            background-color: #ff63e1;
+        }
+
+        .badge-unique {
+            color: #000;
+            background-color: #ffb626;
+        }
     </style>
   </head>
   <body>
@@ -56,6 +91,7 @@
                             <span class="badge badge-eth">Ethereum</span>
                         {{/when}}
                         <span class="badge badge-success">NFT</span>
+                        <span class="badge badge-{{ nft.data.wearable.rarity }}">{{ nft.data.wearable.rarity }}</span>
                     {{else}}
                         <h5 class="card-title"><a onclick="searchForTerm( '{{ name }}' )" href="#">{{ name }}</a></h5>
                         <span class="badge badge-info">{{ divide price 1000000000000000000 }}</span>
@@ -70,6 +106,7 @@
                             <span class="badge badge-eth">Ethereum</span>
                         {{/when}}
                         <span class="badge badge-success">Item</span>
+                        <span class="badge badge-{{ data.wearable.rarity }}">{{ data.wearable.rarity }}</span>
                     {{/if}}
                 </div>
             </div>
@@ -185,7 +222,7 @@
                     var products = returnData.data;
                     
                     products.forEach( function( product ){
-                        //console.log( product );
+                        console.log( product );
                         $( '#productsList' ).append( productTemplate( product ) );
                     } )
                 }
@@ -199,7 +236,7 @@
                     var products = returnData.data;
                     
                     products.forEach( function( product ){
-                        //console.log( product );
+                        console.log( product );
                         $( '#productsList' ).append( productTemplate( product ) );
                     } )
                 }
@@ -221,7 +258,7 @@
                     var products = returnData.data;
                     
                     products.forEach( function( product ){
-                        //console.log( product );
+                        console.log( product );
                         
                         $( '#productsList' ).append( template( product ) );
                     } );
@@ -236,7 +273,7 @@
                     var products = returnData.data;
                     
                     products.forEach( function( product ){
-                        //console.log( product );
+                        console.log( product );
 
                         $( '#productsList' ).append( template( product ) );
                     } );
