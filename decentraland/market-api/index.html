@@ -9,36 +9,68 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
     <title>Hello, world!</title>
+    <style>
+        .badge-eth {
+            color: #FFF;
+            background-color: rgb(212, 130, 23);
+        }
+
+        .badge-poly {
+            color: #FFF;
+            background-color: rgb(121, 17, 153);
+        }
+    </style>
   </head>
   <body>
-    https://nft-api.decentraland.org/v1/items?first=24&sortBy=recently_reviewed&isOnSale=true&search=MODA+Moon+Boots
     <div class="container">
         <div class="row justify-content-center"><div class="col"><input class="form-control form-control-lg" type="text" placeholder="Search" id="searchTerm"></div></div>
-        <div class="row justify-content-center" id="appView">
-        </div>
+        <div id="appView"></div>
     </div>
     <template id="searchResultTemplate">
         <p>You are searching for <b>{{ searchTerm }}</b></p>
+    </template>
+    <template id="resultsTemplate">
         <div class="row justify-content-center" id="productsList">
         </div>
     </template>
     <template id="productTemplate">
-        <div class="col">
-            <div class="card" style="width: 18rem;">
-                <img class="card-img-top" src="{{ nft.image }}" alt="Card image cap">
+        <div class="col-sm-3">
+            <div class="card">
+                {{#if nft }}
+                    <img class="card-img-top" src="{{ nft.image }}" alt="Card image cap">
+                {{else}}
+                    <img class="card-img-top" src="{{ thumbnail }}" alt="Card image cap">
+                {{/if}}
                 <div class="card-body">
-                    <h5 class="card-title">{{ nft.name }}</h5>
-                    <span class="badge badge-info">{{ divide order.price 1000000000000000000 }}</span>
-                    {{#if nft.data.wearable }}
-                        <p class="card-text">{{ nft.data.wearable.description }}</p>
+                    {{#if nft }}
+                        <h5 class="card-title">{{ nft.name }}</h5>
+                        <span class="badge badge-info">{{ divide order.price 1000000000000000000 }}</span>
+                        {{#if nft.data.wearable }}
+                            <p class="card-text">{{ nft.data.wearable.description }}</p>
+                        {{/if}}
+                        <span class="badge badge-primary">{{ nft.category }}</span>
+                        {{#when nft.network 'eq' 'MATIC' }}
+                            <span class="badge badge-poly">Polygon</span>
+                        {{/when}}
+                        {{#when nft.network 'neq' 'MATIC' }}
+                            <span class="badge badge-eth">Ethereum</span>
+                        {{/when}}
+                        <span class="badge badge-success">NFT</span>
+                    {{else}}
+                        <h5 class="card-title">{{ name }}</h5>
+                        <span class="badge badge-info">{{ divide price 1000000000000000000 }}</span>
+                        {{#if data.wearable }}
+                            <p class="card-text">{{ data.wearable.description }}</p>
+                        {{/if}}
+                        <span class="badge badge-primary">{{ category }}</span>
+                        {{#when network 'eq' 'MATIC' }}
+                            <span class="badge badge-poly">Polygon</span>
+                        {{/when}}
+                        {{#when network 'neq' 'MATIC' }}
+                            <span class="badge badge-eth">Ethereum</span>
+                        {{/when}}
+                        <span class="badge badge-success">Item</span>
                     {{/if}}
-                    <span class="badge badge-primary">{{ nft.category }}</span>
-                    {{#when nft.network 'eq' 'MATIC' }}
-                        <span class="badge badge-success">Polygon</span>
-                    {{/when}}
-                    {{#when nft.network 'neq' 'MATIC' }}
-                        <span class="badge badge-success">Ethereum</span>
-                    {{/when}}
                 </div>
             </div>
         </div>
@@ -108,13 +140,13 @@
 
         $( '#searchTerm' ).on( 'input', function( e ){
             var template = Handlebars.compile( $( '#searchResultTemplate' ).html() );
+            var resultsTemplate = Handlebars.compile( $( '#resultsTemplate' ).html() );
             var productTemplate = Handlebars.compile( $( '#productTemplate' ).html() );
 
             var searchTerm = $( '#searchTerm' ).val();
 
             $( '#appView' ).html( template( { searchTerm: searchTerm } ) );
-
-            console.log( "searching " + searchTerm );
+            $( '#appView' ).append( resultsTemplate( ) );
 
             if( searchTerm.length > 0 )
             {
@@ -124,12 +156,25 @@
                     url: 'https://nft-api.decentraland.org/v1/nfts?first=24&skip=0&sortBy=recently_listed&category=wearable&isOnSale=true&search=' + urlEncodedSearch,
                     success: function( data )
                     {
-
                         var returnData = data;
                         var products = returnData.data;
                         
                         products.forEach( function( product ){
-                            console.log( product );
+                            //console.log( product );
+                            $( '#productsList' ).append( productTemplate( product ) );
+                        } )
+                    }
+                } )
+
+                $.ajax( {
+                    url: 'https://nft-api.decentraland.org/v1/items?first=24&sortBy=recently_reviewed&isOnSale=true&search=' + urlEncodedSearch,
+                    success: function( data )
+                    {
+                        var returnData = data;
+                        var products = returnData.data;
+                        
+                        products.forEach( function( product ){
+                            //console.log( product );
                             $( '#productsList' ).append( productTemplate( product ) );
                         } )
                     }
@@ -150,24 +195,38 @@
 
         var showMainResults = function()
         {
+            var resultsTemplate = Handlebars.compile( $( '#resultsTemplate' ).html() );
             var template = Handlebars.compile( $( '#productTemplate' ).html() );
+
+            $( '#appView' ).html( resultsTemplate( ) );
 
             $.ajax( {
                 url: 'https://nft-api.decentraland.org/v1/nfts?first=24&skip=0&sortBy=recently_listed&category=wearable&isOnSale=true',
                 success: function( data )
                 {
-
                     var returnData = data;
                     var products = returnData.data;
-
-                    var fullHtml = '';
                     
                     products.forEach( function( product ){
-                        console.log( product );
-                        fullHtml = fullHtml + template( product );
+                        //console.log( product );
+                        
+                        $( '#productsList' ).append( template( product ) );
                     } );
+                }
+            } )
+            
+            $.ajax( {
+                url: 'https://nft-api.decentraland.org/v1/items?first=24&skip=0&sortBy=recently_listed&category=wearable&isOnSale=true',
+                success: function( data )
+                {
+                    var returnData = data;
+                    var products = returnData.data;
+                    
+                    products.forEach( function( product ){
+                        //console.log( product );
 
-                    $( '#appView' ).html( fullHtml );
+                        $( '#productsList' ).append( template( product ) );
+                    } );
                 }
             } )
         }
