@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <title>Hello, world!</title>
+  </head>
+  <body>
+    <div class="container">
+        <div class="row justify-content-center" id="productsList">
+        </div>
+    </div>
+    <template id="productTemplate">
+        <div class="col">
+            <div class="card" style="width: 18rem;">
+                <img class="card-img-top" src="{{ nft.image }}" alt="Card image cap">
+                <div class="card-body">
+                    <h5 class="card-title">{{ nft.name }}</h5>
+                    {{#if nft.data.wearable }}
+                        <p class="card-text">{{ nft.data.wearable.description }}</p>
+                    {{/if}}
+                    <span class="badge badge-primary">{{ nft.category }}</span>
+                    {{#when nft.network 'eq' 'MATIC' }}
+                        <span class="badge badge-success">Polygon</span>
+                    {{/when}}
+                    {{#when nft.network 'neq' 'MATIC' }}
+                        <span class="badge badge-success">Ethereum</span>
+                    {{/when}}
+                </div>
+            </div>
+        </div>
+    </template>
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
+    <script>
+
+        Handlebars.registerHelper( "when", function( operand_1, operator, operand_2, options ) {
+
+            if( typeof operand_1 == 'boolean' )
+            {
+                operand_1 = operand_1.toString();
+            }
+
+            if( typeof operand_2 == 'boolean' )
+            {
+                operand_2 = operand_2.toString();
+            }
+
+            var operators = {
+                'eq': function(l,r) { return l == r; },
+                'neq': function(l,r) { return l != r; },
+                'gt': function(l,r) { return Number(l) > Number(r); },
+                'gte': function(l,r) { return Number(l) >= Number(r); },
+                'lt': function(l,r) { return Number(l) < Number(r); },
+                'lte': function(l,r) { return Number(l) <= Number(r); },
+                'or': function(l,r) { return l || r; },
+                'and': function(l,r) { return l && r; },
+                '%': function(l,r) { return (l % r) === 0; }
+            }, 
+            result = operators[operator](operand_1,operand_2);
+
+            if (result) return options.fn(this);
+            else  return options.inverse(this);
+        });
+
+        Handlebars.registerHelper( 'times', function( n, block ) {
+            var accum = '';
+            for(var i = 0; i < n; ++i)
+                accum += block.fn(i);
+            return accum;
+        });
+
+        Handlebars.registerHelper( 'for', function( from, to, incr, block ) {
+            var accum = '';
+            for(var i = from; i < to; i += incr)
+                accum += block.fn(i);
+            return accum;
+        });
+
+        Handlebars.registerHelper( 'add', function( a, b ) {
+            return Number(a) + Number(b);
+        });
+
+        Handlebars.registerHelper( 'fixed', function( a, b ) {
+            return a.toFixed( b );
+        });
+
+        $( function(){
+
+
+
+            var template = Handlebars.compile( $( '#productTemplate' ).html() );
+
+            $.ajax( {
+                url: 'https://nft-api.decentraland.org/v1/nfts?first=24&skip=0&sortBy=recently_listed&category=wearable&isOnSale=true',
+                success: function( data )
+                {
+
+                    var returnData = data;
+                    var products = returnData.data;
+                    
+                    products.forEach( function( product ){
+                        console.log( product );
+                        $( '#productsList' ).append( template( product ) );
+                    } )
+                }
+            } )
+        })
+    </script>
+  </body>
+</html>
