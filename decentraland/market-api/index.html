@@ -11,16 +11,24 @@
     <title>Hello, world!</title>
   </head>
   <body>
+    https://nft-api.decentraland.org/v1/items?first=24&sortBy=recently_reviewed&isOnSale=true&search=MODA+Moon+Boots
     <div class="container">
-        <div class="row justify-content-center" id="productsList">
+        <div class="row justify-content-center"><div class="col"><input class="form-control form-control-lg" type="text" placeholder="Search" id="searchTerm"></div></div>
+        <div class="row justify-content-center" id="appView">
         </div>
     </div>
+    <template id="searchResultTemplate">
+        <p>You are searching for <b>{{ searchTerm }}</b></p>
+        <div class="row justify-content-center" id="productsList">
+        </div>
+    </template>
     <template id="productTemplate">
         <div class="col">
             <div class="card" style="width: 18rem;">
                 <img class="card-img-top" src="{{ nft.image }}" alt="Card image cap">
                 <div class="card-body">
                     <h5 class="card-title">{{ nft.name }}</h5>
+                    <span class="badge badge-info">{{ divide order.price 1000000000000000000 }}</span>
                     {{#if nft.data.wearable }}
                         <p class="card-text">{{ nft.data.wearable.description }}</p>
                     {{/if}}
@@ -90,14 +98,58 @@
             return Number(a) + Number(b);
         });
 
+        Handlebars.registerHelper( 'divide', function( a, b ) {
+            return Number(a) / Number(b);
+        });
+
         Handlebars.registerHelper( 'fixed', function( a, b ) {
             return a.toFixed( b );
         });
 
+        $( '#searchTerm' ).on( 'input', function( e ){
+            var template = Handlebars.compile( $( '#searchResultTemplate' ).html() );
+            var productTemplate = Handlebars.compile( $( '#productTemplate' ).html() );
+
+            var searchTerm = $( '#searchTerm' ).val();
+
+            $( '#appView' ).html( template( { searchTerm: searchTerm } ) );
+
+            console.log( "searching " + searchTerm );
+
+            if( searchTerm.length > 0 )
+            {
+                var urlEncodedSearch = encodeURIComponent( searchTerm );
+
+                $.ajax( {
+                    url: 'https://nft-api.decentraland.org/v1/nfts?first=24&skip=0&sortBy=recently_listed&category=wearable&isOnSale=true&search=' + urlEncodedSearch,
+                    success: function( data )
+                    {
+
+                        var returnData = data;
+                        var products = returnData.data;
+                        
+                        products.forEach( function( product ){
+                            console.log( product );
+                            $( '#productsList' ).append( productTemplate( product ) );
+                        } )
+                    }
+                } )
+            }
+            else
+            {
+                showMainResults();
+            }
+            
+        });
+
         $( function(){
 
+            showMainResults();
+            
+        })
 
-
+        var showMainResults = function()
+        {
             var template = Handlebars.compile( $( '#productTemplate' ).html() );
 
             $.ajax( {
@@ -107,14 +159,18 @@
 
                     var returnData = data;
                     var products = returnData.data;
+
+                    var fullHtml = '';
                     
                     products.forEach( function( product ){
                         console.log( product );
-                        $( '#productsList' ).append( template( product ) );
-                    } )
+                        fullHtml = fullHtml + template( product );
+                    } );
+
+                    $( '#appView' ).html( fullHtml );
                 }
             } )
-        })
+        }
     </script>
   </body>
 </html>
