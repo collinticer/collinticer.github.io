@@ -58,9 +58,79 @@
   </head>
   <body>
     <div class="container">
-        <div class="row justify-content-center mb-3"><div class="col"><input class="form-control form-control-lg" type="text" placeholder="Search" id="searchTerm"></div></div>
+        <div class="row justify-content-center mb-3">
+            <div class="col-12"><input class="form-control form-control-lg" type="text" placeholder="Search" id="searchTerm"></div>
+            <div id="rarityFilters"></div>
+        </div>
         <div id="appView"></div>
     </div>
+    <template id="rarityFiltersTemplate">
+        <div class="col-12">
+            <div class="form-check form-check-inline">
+                {{#when ( rarityIsSelected 'common' ) 'eq' 'true' }}
+                    <input class="form-check-input" type="checkbox" id="commonRarityCheckbox" value="common" onchange="updateRarity( 'common' )" checked>
+                {{/when}}
+                {{#when ( rarityIsSelected 'common' ) 'eq' 'false' }}
+                    <input class="form-check-input" type="checkbox" id="commonRarityCheckbox" value="common" onchange="updateRarity( 'common' )">
+                {{/when}}
+                <label class="form-check-label" for="commonRarityCheckbox">common</label>
+            </div>
+            <div class="form-check form-check-inline">
+                {{#when ( rarityIsSelected 'uncommon' ) 'eq' 'true' }}
+                    <input class="form-check-input" type="checkbox" id="uncommonRarityCheckbox" value="uncommon" onchange="updateRarity( 'uncommon' )" checked>
+                {{/when}}
+                {{#when ( rarityIsSelected 'uncommon' ) 'eq' 'false' }}
+                    <input class="form-check-input" type="checkbox" id="uncommonRarityCheckbox" value="uncommon" onchange="updateRarity( 'uncommon' )">
+                {{/when}}
+                <label class="form-check-label" for="uncommonRarityCheckbox">uncommon</label>
+            </div>
+            <div class="form-check form-check-inline">
+                {{#when ( rarityIsSelected 'rare' ) 'eq' 'true' }}
+                    <input class="form-check-input" type="checkbox" id="rareRarityCheckbox" value="rare" onchange="updateRarity( 'rare' )" checked>
+                {{/when}}
+                {{#when ( rarityIsSelected 'rare' ) 'eq' 'false' }}
+                    <input class="form-check-input" type="checkbox" id="rareRarityCheckbox" value="rare" onchange="updateRarity( 'rare' )">
+                {{/when}}
+                <label class="form-check-label" for="rareRarityCheckbox">rare</label>
+            </div>
+            <div class="form-check form-check-inline">
+                {{#when ( rarityIsSelected 'epic' ) 'eq' 'true' }}
+                    <input class="form-check-input" type="checkbox" id="epicRarityCheckbox" value="epic" onchange="updateRarity( 'epic' )" checked>
+                {{/when}}
+                {{#when ( rarityIsSelected 'epic' ) 'eq' 'false' }}
+                    <input class="form-check-input" type="checkbox" id="epicRarityCheckbox" value="epic" onchange="updateRarity( 'epic' )">
+                {{/when}}
+                <label class="form-check-label" for="epicRarityCheckbox">epic</label>
+            </div>
+            <div class="form-check form-check-inline">
+                {{#when ( rarityIsSelected 'legendary' ) 'eq' 'true' }}
+                    <input class="form-check-input" type="checkbox" id="legendaryRarityCheckbox" value="legendary" onchange="updateRarity( 'legendary' )" checked>
+                {{/when}}
+                {{#when ( rarityIsSelected 'legendary' ) 'eq' 'false' }}
+                    <input class="form-check-input" type="checkbox" id="legendaryRarityCheckbox" value="legendary" onchange="updateRarity( 'legendary' )">
+                {{/when}}
+                <label class="form-check-label" for="legendaryRarityCheckbox">legendary</label>
+            </div>
+            <div class="form-check form-check-inline">
+                {{#when ( rarityIsSelected 'mythic' ) 'eq' 'true' }}
+                    <input class="form-check-input" type="checkbox" id="mythicRarityCheckbox" value="mythic" onchange="updateRarity( 'mythic' )" checked>
+                {{/when}}
+                {{#when ( rarityIsSelected 'mythic' ) 'eq' 'false' }}
+                    <input class="form-check-input" type="checkbox" id="mythicRarityCheckbox" value="mythic" onchange="updateRarity( 'mythic' )">
+                {{/when}}
+                <label class="form-check-label" for="mythicRarityCheckbox">mythic</label>
+            </div>
+            <div class="form-check form-check-inline">
+                {{#when ( rarityIsSelected 'unique' ) 'eq' 'true' }}
+                    <input class="form-check-input" type="checkbox" id="uniqueRarityCheckbox" value="unique" onchange="updateRarity( 'unique' )" checked>
+                {{/when}}
+                {{#when ( rarityIsSelected 'unique' ) 'eq' 'false' }}
+                    <input class="form-check-input" type="checkbox" id="uniqueRarityCheckbox" value="unique" onchange="updateRarity( 'unique' )">
+                {{/when}}
+                <label class="form-check-label" for="uniqueRarityCheckbox">unique</label>
+            </div>
+        </div>
+    </template>
     <template id="searchResultTemplate">
         <p class="alert alert-info text-center">You are searching for <b>{{ searchTerm }}</b><br><a onclick="showMainResults()" class="btn btn-sm btn-warning">Clear search</a></p>
     </template>
@@ -81,41 +151,55 @@
                 {{else}}
                     <img class="card-img-top" src="{{ thumbnail }}" alt="{{ data.wearable.description }}" onclick="searchForTerm( '{{{ escape name }}}' )">
                 {{/if}}
-                <div class="card-body">
-                    {{#if nft }}
+                {{#if nft }}
+                    <div class="card-body">
                         <h5 class="card-title"><a onclick="searchForTerm( '{{ nft.name }}' )" >{{ nft.name }}</a></h5>
-                        <span class="badge badge-info">{{ divide order.price 1000000000000000000 }}</span>
+                        <span class="badge badge-info"></span>
                         {{#if nft.data.wearable }}
                             <p class="card-text">{{ nft.data.wearable.description }}</p>
                         {{/if}}
-                        <a href="https://market.decentraland.org{{ nft.url }}" target="_blank">View on DCL Market</a><br>
-                        <span class="badge badge-primary">{{ nft.category }}</span>
-                        {{#when nft.network 'eq' 'MATIC' }}
-                            <span class="badge badge-poly">Polygon</span>
-                        {{/when}}
-                        {{#when nft.network 'neq' 'MATIC' }}
-                            <span class="badge badge-eth">Ethereum</span>
-                        {{/when}}
-                        <span class="badge badge-success">NFT</span>
-                        <span class="badge badge-{{ nft.data.wearable.rarity }}">{{ nft.data.wearable.rarity }}</span>
+                        <a href="https://market.decentraland.org{{ nft.url }}" target="_blank">View on DCL Market</a><br>                        
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><b>Category</b> {{ nft.category }}</li>
+                        <li class="list-group-item"><b>Type</b> NFT</li>
+                        <li class="list-group-item"><b>Price</b> {{ divide order.price 1000000000000000000 }}</li>
+                        <li class="list-group-item"><b>Currency</b> 
+                            {{#when nft.network 'eq' 'MATIC' }}
+                                <span class="badge badge-poly">Poly</span>
+                            {{/when}}
+                            {{#when nft.network 'neq' 'MATIC' }}
+                                <span class="badge badge-eth">Mana</span>
+                            {{/when}}
+                        </li>
+                        <li class="list-group-item"><b>Rarity</b> <span class="badge badge-{{ nft.data.wearable.rarity }}">{{ nft.data.wearable.rarity }}</span></li>
+                        <li class="list-group-item"><b>Created</b> {{ date order.createdAt }}</li>
+                        <li class="list-group-item"><b>Expires</b> {{ date order.expiresAt }}</li>
+                    </ul>
                     {{else}}
+                    <div class="card-body">
                         <h5 class="card-title"><a onclick="searchForTerm( '{{ name }}' )" >{{ name }}</a></h5>
-                        <span class="badge badge-info">{{ divide price 1000000000000000000 }}</span>
                         {{#if data.wearable }}
                             <p class="card-text">{{ data.wearable.description }}</p>
                         {{/if}}
                         <a href="https://market.decentraland.org{{ url }}" target="_blank">View on DCL Market</a><br>
-                        <span class="badge badge-primary">{{ category }}</span>
-                        {{#when network 'eq' 'MATIC' }}
-                            <span class="badge badge-poly">Polygon</span>
-                        {{/when}}
-                        {{#when network 'neq' 'MATIC' }}
-                            <span class="badge badge-eth">Ethereum</span>
-                        {{/when}}
-                        <span class="badge badge-success">Item</span>
-                        <span class="badge badge-{{ data.wearable.rarity }}">{{ data.wearable.rarity }}</span>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><b>Category</b> {{ category }}</li>
+                        <li class="list-group-item"><b>Type</b> Item</li>
+                        <li class="list-group-item"><b>Price</b> {{ divide price 1000000000000000000 }}</li>
+                        <li class="list-group-item"><b>Currency</b> 
+                            {{#when network 'eq' 'MATIC' }}
+                                <span class="badge badge-poly">Poly</span>
+                            {{/when}}
+                            {{#when network 'neq' 'MATIC' }}
+                                <span class="badge badge-eth">Mana</span>
+                            {{/when}}
+                        </li>
+                        <li class="list-group-item"><b>Rarity</b> <span class="badge badge-{{ data.wearable.rarity }}">{{ data.wearable.rarity }}</span></li>
+                        <li class="list-group-item"><b>Created</b> {{ date createdAt }}</li>
+                    </ul>
                     {{/if}}
-                </div>
             </div>
         </div>
     </template>
@@ -182,17 +266,42 @@
             return a.toFixed( b );
         });
 
+        Handlebars.registerHelper( 'date', function( a ) {
+            return new Date( a );
+        });
+
         Handlebars.registerHelper('escape', function(variable) {
             return variable.replace(/(['"])/g, '\\$1');
         });
+
+        Handlebars.registerHelper( 'rarityIsSelected', function( rarity ){
+            return ( window.app.rarity.indexOf( rarity ) >= 0 );
+        })
 
         window.app = window.app || {};
         window.app.ownerAddress = window.app.ownerAddress || '';
         window.app.resultsPerPage = window.app.resultsPerPage || 24;
         window.app.resultsToSkip = window.app.resultsToSkip || 0;
         window.app.searchTerm = window.app.searchTerm || '';
+        window.app.rarity = window.app.rarity || [ 'epic' ];
 
         $( '#searchTerm' ).on( 'input', function( e ){
+
+            searchOrShowMainResults();
+            
+        });
+
+        $( function(){
+
+            searchOrShowMainResults();
+            
+        })
+
+        var searchOrShowMainResults = function()
+        {
+            var rarityFiltersTemplate = Handlebars.compile( $( '#rarityFiltersTemplate' ).html() );
+
+            $( '#rarityFilters' ).html( rarityFiltersTemplate() );
 
             var searchTerm = $( '#searchTerm' ).val();
             window.app.searchTerm = searchTerm;
@@ -205,14 +314,23 @@
             {
                 showMainResults();
             }
-            
-        });
+        }
 
-        $( function(){
+        var updateRarity = function( rarity )
+        {
+            var rarityIndex = window.app.rarity.indexOf( rarity );
 
-            showMainResults();
-            
-        })
+            if( rarityIndex >= 0 )
+            {
+                window.app.rarity.splice( rarityIndex, 1 );
+            }
+            else
+            {
+                window.app.rarity.push( rarity );
+            }
+
+            searchOrShowMainResults();
+        }
 
         var loadMoreResults = function( searchTerm )
         {
@@ -235,6 +353,17 @@
             var resultsTemplate = Handlebars.compile( $( '#resultsTemplate' ).html() );
             var productTemplate = Handlebars.compile( $( '#productTemplate' ).html() );
 
+            var nftRarityString = '';
+            var itemRarityString = '';
+
+            if( window.app.rarity.length > 0 )
+            {
+                window.app.rarity.forEach( function( rarity ){
+                    nftRarityString = nftRarityString + '&itemRarity=' + encodeURIComponent( rarity );
+                    itemRarityString = itemRarityString + '&rarity=' + encodeURIComponent( rarity );
+                })
+            }
+
             if( keepCurrentResults == false )
             {
                 $( '#appView' ).html( template( { searchTerm: searchTerm } ) );
@@ -247,7 +376,7 @@
             var urlEncodedSearch = encodeURIComponent( searchTerm );
 
             $.ajax( {
-                url: 'https://nft-api.decentraland.org/v1/nfts?first=' + window.app.resultsPerPage + '&skip=' + window.app.resultsToSkip + '&sortBy=recently_listed&category=wearable&isOnSale=true&search=' + urlEncodedSearch,
+                url: 'https://nft-api.decentraland.org/v1/nfts?first=' + window.app.resultsPerPage + '&skip=' + window.app.resultsToSkip + '&sortBy=recently_listed&category=wearable&isOnSale=true&search=' + urlEncodedSearch + nftRarityString,
                 success: function( data )
                 {
                     var returnData = data;
@@ -261,7 +390,7 @@
             } )
 
             $.ajax( {
-                url: 'https://nft-api.decentraland.org/v1/items?first=' + window.app.resultsPerPage + '&skip=' + window.app.resultsToSkip + '&sortBy=recently_reviewed&isOnSale=true&search=' + urlEncodedSearch,
+                url: 'https://nft-api.decentraland.org/v1/items?first=' + window.app.resultsPerPage + '&skip=' + window.app.resultsToSkip + '&sortBy=recently_reviewed&isOnSale=true&search=' + urlEncodedSearch + itemRarityString,
                 success: function( data )
                 {
                     var returnData = data;
@@ -281,6 +410,17 @@
             var resultsTemplate = Handlebars.compile( $( '#resultsTemplate' ).html() );
             var template = Handlebars.compile( $( '#productTemplate' ).html() );
 
+            var nftRarityString = '';
+            var itemRarityString = '';
+
+            if( window.app.rarity.length > 0 )
+            {
+                window.app.rarity.forEach( function( rarity ){
+                    nftRarityString = nftRarityString + '&itemRarity=' + encodeURIComponent( rarity );
+                    itemRarityString = itemRarityString + '&rarity=' + encodeURIComponent( rarity );
+                })
+            }
+
             if( keepCurrentResults == false )
             {
                 $( '#appView' ).html( resultsTemplate( { searchTerm: window.app.searchTerm } ) );
@@ -290,7 +430,7 @@
             }
 
             $.ajax( {
-                url: 'https://nft-api.decentraland.org/v1/nfts?first=' + window.app.resultsPerPage + '&skip=' + window.app.resultsToSkip + '&sortBy=recently_listed&category=wearable&isOnSale=true',
+                url: 'https://nft-api.decentraland.org/v1/nfts?first=' + window.app.resultsPerPage + '&skip=' + window.app.resultsToSkip + '&sortBy=recently_listed&category=wearable&isOnSale=true' + nftRarityString,
                 success: function( data )
                 {
                     var returnData = data;
@@ -305,7 +445,7 @@
             } )
             
             $.ajax( {
-                url: 'https://nft-api.decentraland.org/v1/items?first=' + window.app.resultsPerPage + '&skip=' + window.app.resultsToSkip + '&sortBy=recently_listed&category=wearable&isOnSale=true',
+                url: 'https://nft-api.decentraland.org/v1/items?first=' + window.app.resultsPerPage + '&skip=' + window.app.resultsToSkip + '&sortBy=recently_listed&category=wearable&isOnSale=true' + itemRarityString,
                 success: function( data )
                 {
                     var returnData = data;
