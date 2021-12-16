@@ -67,6 +67,11 @@
     <template id="resultsTemplate">
         <div class="row justify-content-center" id="productsList">
         </div>
+        {{#if searchTerm }}
+            <a onclick="loadMoreResults( '{{ searchTerm }}' )" class="btn btn-success btn-md">Load More</a>
+        {{else}}
+            <a onclick="loadMoreResults()" class="btn btn-success btn-md">Load More</a>
+        {{/if}}
     </template>
     <template id="productTemplate">
         <div class="col-sm-3 mb-3">
@@ -78,7 +83,7 @@
                 {{/if}}
                 <div class="card-body">
                     {{#if nft }}
-                        <h5 class="card-title"><a onclick="searchForTerm( '{{ nft.name }}' )" href="#">{{ nft.name }}</a></h5>
+                        <h5 class="card-title"><a onclick="searchForTerm( '{{ nft.name }}' )" >{{ nft.name }}</a></h5>
                         <span class="badge badge-info">{{ divide order.price 1000000000000000000 }}</span>
                         {{#if nft.data.wearable }}
                             <p class="card-text">{{ nft.data.wearable.description }}</p>
@@ -93,7 +98,7 @@
                         <span class="badge badge-success">NFT</span>
                         <span class="badge badge-{{ nft.data.wearable.rarity }}">{{ nft.data.wearable.rarity }}</span>
                     {{else}}
-                        <h5 class="card-title"><a onclick="searchForTerm( '{{ name }}' )" href="#">{{ name }}</a></h5>
+                        <h5 class="card-title"><a onclick="searchForTerm( '{{ name }}' )" >{{ name }}</a></h5>
                         <span class="badge badge-info">{{ divide price 1000000000000000000 }}</span>
                         {{#if data.wearable }}
                             <p class="card-text">{{ data.wearable.description }}</p>
@@ -181,10 +186,14 @@
 
         window.app = window.app || {};
         window.app.ownerAddress = window.app.ownerAddress || '';
+        window.app.resultsPerPage = window.app.resultsPerPage || 24;
+        window.app.resultsToSkip = window.app.resultsToSkip || 0;
+        window.app.searchTerm = window.app.searchTerm || '';
 
         $( '#searchTerm' ).on( 'input', function( e ){
 
             var searchTerm = $( '#searchTerm' ).val();
+            window.app.searchTerm = searchTerm;
 
             if( searchTerm.length > 0 )
             {
@@ -203,19 +212,40 @@
             
         })
 
-        var searchForTerm = function( searchTerm )
+        var loadMoreResults = function( searchTerm )
+        {
+            window.app.resultsPerPage = 24;
+            window.app.resultsToSkip = window.app.resultsToSkip + window.app.resultsPerPage;
+
+            if( typeof searchTerm != 'undefined' && searchTerm.length > 0 )
+            {
+                searchForTerm( searchTerm, true);
+            }
+            else
+            {
+                showMainResults( true );
+            }
+        }
+
+        var searchForTerm = function( searchTerm, keepCurrentResults = false )
         {
             var template = Handlebars.compile( $( '#searchResultTemplate' ).html() );
             var resultsTemplate = Handlebars.compile( $( '#resultsTemplate' ).html() );
             var productTemplate = Handlebars.compile( $( '#productTemplate' ).html() );
 
-            $( '#appView' ).html( template( { searchTerm: searchTerm } ) );
-            $( '#appView' ).append( resultsTemplate( ) );
+            if( keepCurrentResults == false )
+            {
+                $( '#appView' ).html( template( { searchTerm: searchTerm } ) );
+                $( '#appView' ).append( resultsTemplate( { searchTerm: window.app.searchTerm } ) );
+
+                window.app.resultsPerPage = 24;
+                window.app.resultsToSkip = 0;
+            }
 
             var urlEncodedSearch = encodeURIComponent( searchTerm );
 
             $.ajax( {
-                url: 'https://nft-api.decentraland.org/v1/nfts?first=24&skip=0&sortBy=recently_listed&category=wearable&isOnSale=true&search=' + urlEncodedSearch,
+                url: 'https://nft-api.decentraland.org/v1/nfts?first=' + window.app.resultsPerPage + '&skip=' + window.app.resultsToSkip + '&sortBy=recently_listed&category=wearable&isOnSale=true&search=' + urlEncodedSearch,
                 success: function( data )
                 {
                     var returnData = data;
@@ -229,7 +259,7 @@
             } )
 
             $.ajax( {
-                url: 'https://nft-api.decentraland.org/v1/items?first=24&sortBy=recently_reviewed&isOnSale=true&search=' + urlEncodedSearch,
+                url: 'https://nft-api.decentraland.org/v1/items?first=' + window.app.resultsPerPage + '&skip=' + window.app.resultsToSkip + '&sortBy=recently_reviewed&isOnSale=true&search=' + urlEncodedSearch,
                 success: function( data )
                 {
                     var returnData = data;
@@ -243,15 +273,22 @@
             } )
         }
 
-        var showMainResults = function()
+        var showMainResults = function( keepCurrentResults = false )
         {
+            window.app.searchTerm = '';
             var resultsTemplate = Handlebars.compile( $( '#resultsTemplate' ).html() );
             var template = Handlebars.compile( $( '#productTemplate' ).html() );
 
-            $( '#appView' ).html( resultsTemplate( ) );
+            if( keepCurrentResults == false )
+            {
+                $( '#appView' ).html( resultsTemplate( { searchTerm: window.app.searchTerm } ) );
+
+                window.app.resultsPerPage = 24;
+                window.app.resultsToSkip = 0;
+            }
 
             $.ajax( {
-                url: 'https://nft-api.decentraland.org/v1/nfts?first=24&skip=0&sortBy=recently_listed&category=wearable&isOnSale=true',
+                url: 'https://nft-api.decentraland.org/v1/nfts?first=' + window.app.resultsPerPage + '&skip=' + window.app.resultsToSkip + '&sortBy=recently_listed&category=wearable&isOnSale=true',
                 success: function( data )
                 {
                     var returnData = data;
@@ -266,7 +303,7 @@
             } )
             
             $.ajax( {
-                url: 'https://nft-api.decentraland.org/v1/items?first=24&skip=0&sortBy=recently_listed&category=wearable&isOnSale=true',
+                url: 'https://nft-api.decentraland.org/v1/items?first=' + window.app.resultsPerPage + '&skip=' + window.app.resultsToSkip + '&sortBy=recently_listed&category=wearable&isOnSale=true',
                 success: function( data )
                 {
                     var returnData = data;
