@@ -1,0 +1,95 @@
+<html>
+    <head>
+        <title>Eco Server Reboot</title>
+    </head>
+    <body>
+        <p id="demo"></p>
+    </body>
+    <script>
+        const secondsInHour = 60 * 60;
+
+        const userDate = new Date( new Date().toUTCString() );
+        const morningDate = new Date( '2022-09-23T10:30:00Z' );
+        const eveningDate = new Date( '2022-09-23T22:30:00Z' );
+        
+        let userNextDayDate = new Date();
+        userNextDayDate.setDate( userDate.getDate() + 1 );//add a day
+
+        const morningRebootSeconds = ( morningDate.getUTCHours() * secondsInHour ) + ( morningDate.getUTCMinutes() * 60 );
+        const eveningRebootSeconds = ( eveningDate.getUTCHours() * secondsInHour ) + ( eveningDate.getUTCMinutes() * 60 );
+
+        const userCurrentDaySeconds = ( userDate.getUTCHours() * secondsInHour ) + ( userDate.getUTCMinutes() * 60 );
+
+        let relevantYear = userDate.getUTCFullYear();
+        let relevantMonth = ("" + ( userDate.getUTCMonth() + 1) ).padStart( 2, '0' );//+1 since it's zero-index
+        let relevantDay = userDate.getDate();
+
+        let relevantHour = morningDate.getUTCHours();
+        let relevantMinutes = morningDate.getUTCMinutes();
+        let relevantSeconds = ( "" + morningDate.getUTCSeconds() ).padStart( 2, '0' );
+
+        //use morning reboot schedule
+        if( userCurrentDaySeconds < morningRebootSeconds )
+        {
+            relevantHour = morningDate.getUTCHours();
+            relevantMinutes = morningDate.getUTCMinutes();
+            relevantSeconds = ( "" + morningDate.getUTCSeconds() ).padStart( 2, '0' );
+        }
+        //use evening reboot schedule
+        else if( userCurrentDaySeconds < eveningRebootSeconds )
+        {
+            relevantHour = eveningDate.getUTCHours();
+            relevantMinutes = eveningDate.getUTCMinutes();
+            relevantSeconds = ( "" + eveningDate.getUTCSeconds() ).padStart( 2, '0' );
+        }
+        //use next morning reboot schedule
+        else
+        {
+            relevantYear = userNextDayDate.getUTCFullYear();
+            relevantMonth = ("" + ( userNextDayDate.getUTCMonth() + 1) ).padStart( 2, '0' );//+1 since it's zero-index
+            relevantDay = userNextDayDate.getDate();
+
+            relevantHour = morningDate.getUTCHours();
+            relevantMinutes = morningDate.getUTCMinutes();
+            relevantSeconds = ( "" + morningDate.getUTCSeconds() ).padStart( 2, '0' );
+        }
+
+        console.log( relevantYear + '-' + relevantMonth + '-' + relevantDay + 'T' + relevantHour + ':' + relevantMinutes + ':' + relevantSeconds + 'Z' );
+        let relevantDate = new Date( relevantYear + '-' + relevantMonth + '-' + relevantDay + 'T' + relevantHour + ':' + relevantMinutes + ':' + relevantSeconds + 'Z' );
+
+        console.log( relevantDate );
+
+        //const date = new Date( '2022-09-23T17:30:00' ).toUTCString();
+        console.log( userDate );
+        console.log( morningDate );
+        console.log( eveningDate );
+
+        let countDownDate = relevantDate;
+
+        // Update the count down every 1 second
+        var x = setInterval(function() {
+
+            // Get today's date and time
+            var now = new Date().getTime();
+
+            // Find the distance between now and the count down date
+            var distance = countDownDate - now;
+
+            // Time calculations for days, hours, minutes and seconds
+            var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            // Display the result in the element with id="demo"
+            document.getElementById("demo").innerHTML = days + "d " + hours + "h "
+            + minutes + "m " + seconds + "s ";
+
+            // If the count down is finished, write some text
+            if (distance < 0) {
+                clearInterval(x);
+                document.getElementById("demo").innerHTML = "EXPIRED";
+            }
+        }, 1000);
+    </script>
+</html>
