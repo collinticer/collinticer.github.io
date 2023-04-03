@@ -42,7 +42,7 @@
 
             let relevantYear = userDate.getUTCFullYear();
             let relevantMonth = ("" + ( userDate.getUTCMonth() + 1) ).padStart( 2, '0' );//+1 since it's zero-index
-            let relevantDay = userDate.getDate();
+            let relevantDay = userDate.getDate().toString().padStart(2, '0')
 
             let relevantHour = morningDate.getUTCHours();
             let relevantMinutes = morningDate.getUTCMinutes();
@@ -67,7 +67,7 @@
             {
                 relevantYear = userNextDayDate.getUTCFullYear();
                 relevantMonth = ("" + ( userNextDayDate.getUTCMonth() + 1) ).padStart( 2, '0' );//+1 since it's zero-index
-                relevantDay = userNextDayDate.getDate();
+                relevantDay = userNextDayDate.getDate().toString().padStart(2, '0')
 
                 relevantHour = morningDate.getUTCHours();
                 relevantMinutes = morningDate.getUTCMinutes();
